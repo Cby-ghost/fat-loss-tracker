@@ -113,6 +113,7 @@ const defaultData = {
 };
 
 let state = loadData();
+let selectedDate = formatDate(new Date());
 
 document.addEventListener("DOMContentLoaded", () => {
   bindNavigation();
@@ -122,9 +123,9 @@ document.addEventListener("DOMContentLoaded", () => {
   renderAll();
 });
 
-function getTodaySchedule() {
+function getTodaySchedule(date = selectedDate) {
   const dayMap = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-  const todayKey = dayMap[new Date().getDay()];
+  const todayKey = dayMap[parseDate(date).getDay()];
   return weeklySchedule[todayKey] || [];
 }
 
@@ -159,8 +160,19 @@ function bindNavigation() {
   });
 
   document.getElementById("todayShortcut").addEventListener("click", () => {
-    setDefaultDates();
     showView("dashboard");
+  });
+
+  document.getElementById("previousDay").addEventListener("click", () => {
+    setViewedDate(formatDate(addDays(parseDate(selectedDate), -1)));
+  });
+
+  document.getElementById("nextDay").addEventListener("click", () => {
+    setViewedDate(formatDate(addDays(parseDate(selectedDate), 1)));
+  });
+
+  document.getElementById("viewDate").addEventListener("change", (event) => {
+    if (event.target.value) setViewedDate(event.target.value);
   });
 }
 
@@ -197,10 +209,19 @@ function bindForms() {
 }
 
 function setDefaultDates() {
-  const today = formatDate(new Date());
+  const today = selectedDate;
   document.querySelectorAll('input[type="date"]').forEach((input) => {
     if (!input.value) input.value = today;
   });
+}
+
+function setViewedDate(date) {
+  if (!date) return;
+  selectedDate = date;
+  document.querySelectorAll('input[type="date"]').forEach((input) => {
+    input.value = date;
+  });
+  renderAll();
 }
 
 function handleFoodSubmit(event) {
@@ -326,14 +347,17 @@ function renderAll() {
 }
 
 function renderDashboard() {
-  const today = formatDate(new Date());
+  const today = selectedDate;
   const totals = getFoodTotals(today);
   const body = getBodyLog(today);
   const trainingDone = isTrainingComplete(today);
   const settings = state.settings;
-  const weekday = new Intl.DateTimeFormat("zh-Hant-TW", { weekday: "long" }).format(new Date());
+  const viewedDate = parseDate(today);
+  const weekday = new Intl.DateTimeFormat("zh-Hant-TW", { weekday: "long" }).format(viewedDate);
+  const isToday = today === formatDate(new Date());
 
-  document.getElementById("todayLabel").textContent = `${today} ${weekday}`;
+  document.getElementById("viewDate").value = today;
+  document.getElementById("todayLabel").textContent = `${today} ${weekday}${isToday ? " 今日" : ""}`;
   renderMetric("calorie", totals.calories, settings.targetCalories, "kcal", true);
   renderMetric("protein", totals.protein, settings.proteinMin, "g", false);
   renderMetric("step", body?.steps || 0, settings.stepGoal, "步", false);
@@ -343,15 +367,15 @@ function renderDashboard() {
   document.getElementById("trainingSummary").textContent = trainingDone ? "已完成" : "尚未完成";
   document.getElementById("trainingStatus").textContent = trainingDone ? "今日訓練有紀錄或行事曆已勾選" : "可在行事曆勾選或新增訓練紀錄";
 
-  const weekly = getWeeklyTrainingStats();
-  document.getElementById("avgWeight").textContent = formatMaybe(getAverageWeight7Days(), " kg");
-  document.getElementById("weekWeightChange").textContent = formatMaybe(getWeekChange("weight"), " kg", true);
-  document.getElementById("weekWaistChange").textContent = formatMaybe(getWeekChange("waist"), " cm", true);
+  const weekly = getWeeklyTrainingStats(viewedDate);
+  document.getElementById("avgWeight").textContent = formatMaybe(getAverageWeight7Days(viewedDate), " kg");
+  document.getElementById("weekWeightChange").textContent = formatMaybe(getWeekChange("weight", viewedDate), " kg", true);
+  document.getElementById("weekWaistChange").textContent = formatMaybe(getWeekChange("waist", viewedDate), " cm", true);
   document.getElementById("strengthCount").textContent = `${weekly.strength} 次`;
   document.getElementById("cardioCount").textContent = `${weekly.cardio} 次`;
-  document.getElementById("bodyInsight").textContent = getBodyInsight();
+  document.getElementById("bodyInsight").textContent = getBodyInsight(viewedDate);
   document.getElementById("trainingInsight").textContent = getTrainingInsight(weekly);
-  renderAdvice(totals, body, trainingDone);
+  renderAdvice(totals, body, trainingDone, today);
 }
 
 function renderMetric(prefix, value, target, unit, highIsBad) {
@@ -392,9 +416,9 @@ function getMetricStatus(value, target, highIsBad) {
 }
 
 function renderSchedule() {
-  const today = formatDate(new Date());
+  const today = selectedDate;
   const checks = state.scheduleChecks[today] || {};
-  const schedule = getTodaySchedule();
+  const schedule = getTodaySchedule(today);
   const root = document.getElementById("todaySchedule");
   document.getElementById("scheduleCount").textContent = `${schedule.length} 項`;
 
@@ -427,9 +451,9 @@ function renderSchedule() {
   });
 }
 
-function renderAdvice(totals, body, trainingDone) {
-  const todayScheduleText = getTodaySchedule().map((item) => item.title).join(" ");
-  const day = new Date().getDay();
+function renderAdvice(totals, body, trainingDone, date = selectedDate) {
+  const todayScheduleText = getTodaySchedule(date).map((item) => item.title).join(" ");
+  const day = parseDate(date).getDay();
   const advice = [];
 
   if (totals.calories > state.settings.targetCalories) advice.push("今天熱量偏高，晚餐或宵夜不要再補高油食物。");
@@ -437,7 +461,7 @@ function renderAdvice(totals, body, trainingDone) {
   if (totals.protein >= state.settings.proteinMin) advice.push("蛋白質達標，今天不用再硬補蛋白粉。");
   if (todayScheduleText.includes("鐵板燒")) advice.push("今天午餐油脂可能偏高，晚餐建議健康餐半飯，主菜選雞胸或魚。");
   if (todayScheduleText.includes("燒臘")) advice.push("今天午餐鈉和油可能偏高，晚餐少醬、多喝水、主菜選低油蛋白質。");
-  if (getTodaySchedule().some((item) => item.type === "training") && !trainingDone) advice.push("今天原本安排重訓，可以改成明天補練或至少快走 30 分鐘。");
+  if (getTodaySchedule(date).some((item) => item.type === "training") && !trainingDone) advice.push("今天原本安排重訓，可以改成明天補練或至少快走 30 分鐘。");
   if ((body?.steps || 0) < state.settings.stepGoal) advice.push("今天活動量偏低，睡前可以補走 15–20 分鐘。");
   if (day === 0) advice.push("今天記得量體重、腰圍，並補下週早餐食物。");
   if (!advice.length) advice.push("今天狀態不錯，照目前節奏完成飲食、步數和訓練即可。");
@@ -446,7 +470,7 @@ function renderAdvice(totals, body, trainingDone) {
 }
 
 function renderFoodPage() {
-  const today = formatDate(new Date());
+  const today = selectedDate;
   const totals = getFoodTotals(today);
   const settings = state.settings;
   document.getElementById("foodTotalCalories").textContent = `${round(totals.calories)} kcal`;
@@ -495,7 +519,7 @@ function addSavedFoodToToday(id) {
   if (!food) return;
   state.foodLogs.push({
     id: cryptoId(),
-    date: formatDate(new Date()),
+    date: selectedDate,
     meal: food.category,
     name: food.name,
     portion: "常用食物快速加入",
@@ -649,14 +673,14 @@ function getBodyLog(date) {
 function isTrainingComplete(date) {
   const hasTrainingLog = state.trainingLogs.some((log) => log.date === date && log.completed && log.type !== "休息");
   const checks = state.scheduleChecks[date] || {};
-  const scheduleTrainingDone = getTodaySchedule().some((item) => {
+  const scheduleTrainingDone = getTodaySchedule(date).some((item) => {
     return ["training", "cardio"].includes(item.type) && checks[scheduleKey(item)];
   });
   return hasTrainingLog || scheduleTrainingDone;
 }
 
-function getWeeklyTrainingStats() {
-  const { start, end } = getWeekRange(new Date());
+function getWeeklyTrainingStats(referenceDate = parseDate(selectedDate)) {
+  const { start, end } = getWeekRange(referenceDate);
   return state.trainingLogs.reduce((stats, log) => {
     const date = parseDate(log.date);
     if (!log.completed || date < start || date > end) return stats;
@@ -666,8 +690,8 @@ function getWeeklyTrainingStats() {
   }, { strength: 0, cardio: 0 });
 }
 
-function getAverageWeight7Days() {
-  const today = new Date();
+function getAverageWeight7Days(referenceDate = parseDate(selectedDate)) {
+  const today = new Date(referenceDate);
   const start = addDays(today, -6);
   const weights = state.bodyLogs
     .filter((log) => log.weight && parseDate(log.date) >= start && parseDate(log.date) <= today)
@@ -676,8 +700,8 @@ function getAverageWeight7Days() {
   return weights.reduce((sum, value) => sum + value, 0) / weights.length;
 }
 
-function getWeekChange(field) {
-  const { start, end } = getWeekRange(new Date());
+function getWeekChange(field, referenceDate = parseDate(selectedDate)) {
+  const { start, end } = getWeekRange(referenceDate);
   const logs = state.bodyLogs
     .filter((log) => log[field] && parseDate(log.date) >= start && parseDate(log.date) <= end)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -685,13 +709,13 @@ function getWeekChange(field) {
   return Number(logs[logs.length - 1][field]) - Number(logs[0][field]);
 }
 
-function getBodyInsight() {
-  const change = getWeekChange("weight");
+function getBodyInsight(referenceDate = parseDate(selectedDate)) {
+  const change = getWeekChange("weight", referenceDate);
   if (change === null) return "身體紀錄至少需要本週兩筆體重，才會判斷下降速度。";
   const loss = -change;
   if (loss >= 0.4 && loss <= 0.8) return "速度合理，繼續目前熱量。";
   if (loss > 1) return "下降速度偏快，注意訓練表現與飢餓感。";
-  if (loss < 0.1 && hasTwoWeeksBodyData()) return "可考慮每日熱量減少 100 kcal，或每日多走 2000 步。";
+  if (loss < 0.1 && hasTwoWeeksBodyData(referenceDate)) return "可考慮每日熱量減少 100 kcal，或每日多走 2000 步。";
   return "本週變化還不明顯，先維持紀錄並觀察趨勢。";
 }
 
@@ -704,8 +728,8 @@ function getTrainingInsight(weekly) {
   return "重訓達標，有氧或快走還可以再補。";
 }
 
-function hasTwoWeeksBodyData() {
-  const today = new Date();
+function hasTwoWeeksBodyData(referenceDate = parseDate(selectedDate)) {
+  const today = new Date(referenceDate);
   const start = addDays(today, -13);
   return state.bodyLogs.filter((log) => log.weight && parseDate(log.date) >= start && parseDate(log.date) <= today).length >= 4;
 }

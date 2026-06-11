@@ -179,6 +179,33 @@ h3 {
   white-space: nowrap;
 }
 
+.date-controls {
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.date-picker-label {
+  display: grid;
+  gap: 4px;
+  min-width: 158px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.date-picker-label input {
+  min-height: 40px;
+  padding-block: 7px;
+  font-weight: 800;
+}
+
+.compact-button {
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
 .metric-grid,
 .stats-grid {
   display: grid;
@@ -494,6 +521,23 @@ h3 {
   .app-header {
     align-items: flex-start;
     padding: 14px 12px 10px;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .date-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .date-picker-label {
+    grid-column: 1 / -1;
+    min-width: 0;
+    order: -1;
   }
 
   .app-shell {

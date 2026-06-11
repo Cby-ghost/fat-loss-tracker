@@ -12,7 +12,7 @@
         <p class="eyebrow">Fat loss tracker</p>
         <h1>減脂飲食與訓練追蹤</h1>
       </div>
-      <button class="ghost-button" id="todayShortcut" type="button">回到今天</button>
+      <button class="ghost-button" id="todayShortcut" type="button">回到首頁</button>
     </header>
 
     <main class="app-shell">
@@ -22,8 +22,16 @@
             <p class="eyebrow">Dashboard</p>
             <h2 id="dashboard-title">首頁</h2>
           </div>
-          <div class="date-pill" id="todayLabel"></div>
+          <div class="date-controls" aria-label="選擇查看日期">
+            <button class="secondary-button compact-button" id="previousDay" type="button">前一天</button>
+            <label class="date-picker-label">
+              <span>查看日期</span>
+              <input id="viewDate" type="date" />
+            </label>
+            <button class="secondary-button compact-button" id="nextDay" type="button">後一天</button>
+          </div>
         </div>
+        <div class="date-pill" id="todayLabel"></div>
 
         <div class="metric-grid">
           <article class="metric-card" id="calorieCard">
