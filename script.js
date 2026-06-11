@@ -309,12 +309,7 @@ function handleSettingsSubmit(event) {
     stepGoalHigh: numberValue(data.get("stepGoalHigh")),
     weeklyStrengthGoal: numberValue(data.get("weeklyStrengthGoal")),
     weeklyCardioGoal: numberValue(data.get("weeklyCardioGoal")),
-    proteinPowder: {
-      calories: numberValue(data.get("powderCalories")),
-      protein: numberValue(data.get("powderProtein")),
-      carbs: numberValue(data.get("powderCarbs")),
-      fat: numberValue(data.get("powderFat"))
-    }
+    proteinPowder: state.settings.proteinPowder || structuredClone(defaultData.settings.proteinPowder)
   };
   saveData();
   renderAll();
@@ -654,10 +649,6 @@ function fillSettingsForm() {
   form.elements.stepGoalHigh.value = settings.stepGoalHigh;
   form.elements.weeklyStrengthGoal.value = settings.weeklyStrengthGoal;
   form.elements.weeklyCardioGoal.value = settings.weeklyCardioGoal;
-  form.elements.powderCalories.value = settings.proteinPowder.calories;
-  form.elements.powderProtein.value = settings.proteinPowder.protein;
-  form.elements.powderCarbs.value = settings.proteinPowder.carbs;
-  form.elements.powderFat.value = settings.proteinPowder.fat;
 }
 
 function getFoodTotals(date) {
