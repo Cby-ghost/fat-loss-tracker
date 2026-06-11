@@ -1,0 +1,542 @@
+:root {
+  --bg: #f5f7f4;
+  --surface: #ffffff;
+  --surface-soft: #eef5ee;
+  --text: #17201b;
+  --muted: #637168;
+  --line: #d9e1da;
+  --green: #1f8f5f;
+  --green-soft: #dff4e9;
+  --yellow: #b78505;
+  --yellow-soft: #fff1c7;
+  --red: #c54545;
+  --red-soft: #ffe2df;
+  --blue: #3468a8;
+  --blue-soft: #e4eefb;
+  --shadow: 0 10px 28px rgba(23, 32, 27, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  color: var(--text);
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+input,
+select {
+  min-height: 44px;
+}
+
+button {
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #fff;
+  background: var(--green);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  background: #fff;
+}
+
+textarea {
+  min-height: 74px;
+  resize: vertical;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  background: rgba(245, 247, 244, 0.94);
+  border-bottom: 1px solid rgba(217, 225, 218, 0.8);
+  backdrop-filter: blur(16px);
+}
+
+.app-shell {
+  width: min(980px, 100%);
+  margin: 0 auto;
+  padding: 16px 16px 104px;
+}
+
+.eyebrow {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ghost-button,
+.secondary-button {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.danger-button {
+  color: #fff;
+  background: var(--red);
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: grid;
+  gap: 16px;
+}
+
+.section-heading,
+.panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.date-pill,
+.type-pill,
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: var(--muted);
+  background: var(--surface-soft);
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.metric-grid,
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric-card,
+.panel,
+.stats-grid > div,
+.log-item,
+.schedule-card,
+.food-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.metric-card {
+  display: grid;
+  gap: 8px;
+  min-height: 138px;
+  padding: 14px;
+}
+
+.metric-card span,
+.stats-grid span,
+.log-meta {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.metric-card strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.metric-card small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.metric-card.good,
+.schedule-card.done {
+  border-color: rgba(31, 143, 95, 0.45);
+  background: linear-gradient(180deg, #fff, var(--green-soft));
+}
+
+.metric-card.warn {
+  border-color: rgba(183, 133, 5, 0.45);
+  background: linear-gradient(180deg, #fff, var(--yellow-soft));
+}
+
+.metric-card.bad {
+  border-color: rgba(197, 69, 69, 0.45);
+  background: linear-gradient(180deg, #fff, var(--red-soft));
+}
+
+.progress {
+  overflow: hidden;
+  width: 100%;
+  height: 9px;
+  border-radius: 999px;
+  background: #e8eee9;
+}
+
+.progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  transition: width 180ms ease;
+}
+
+.metric-card.warn .progress span {
+  background: var(--yellow);
+}
+
+.metric-card.bad .progress span {
+  background: var(--red);
+}
+
+.panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.schedule-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 12px;
+  padding: 14px;
+}
+
+.schedule-time {
+  color: var(--green);
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.schedule-title {
+  min-width: 0;
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.schedule-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.schedule-actions label,
+.checkline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.schedule-actions input,
+.checkline input {
+  width: 22px;
+  min-height: 22px;
+  height: 22px;
+  accent-color: var(--green);
+}
+
+.type-class {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.type-meal {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.type-training {
+  color: #7b4fb3;
+  background: #efe7fb;
+}
+
+.type-cardio {
+  color: #b65a16;
+  background: #ffe7d3;
+}
+
+.type-reminder {
+  color: var(--yellow);
+  background: var(--yellow-soft);
+}
+
+.type-body {
+  color: #8b4f64;
+  background: #f8e2ea;
+}
+
+.advice-list,
+.log-list,
+.quick-list {
+  display: grid;
+  gap: 10px;
+}
+
+.advice {
+  border-left: 4px solid var(--green);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--surface-soft);
+  font-weight: 700;
+}
+
+.stats-grid > div {
+  display: grid;
+  gap: 4px;
+  min-height: 84px;
+  padding: 12px;
+}
+
+.stats-grid strong {
+  font-size: 19px;
+}
+
+.stats-grid.compact > div {
+  min-height: 72px;
+}
+
+.insight {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.number-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quick-list {
+  grid-template-columns: 1fr;
+}
+
+.food-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.food-card header,
+.log-item header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.food-card strong,
+.log-item strong {
+  font-size: 16px;
+}
+
+.food-actions,
+.log-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.food-actions button,
+.log-actions button {
+  min-height: 38px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.log-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.hidden {
+  display: none;
+}
+
+.bottom-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--line);
+  backdrop-filter: blur(16px);
+}
+
+.bottom-nav button {
+  min-height: 48px;
+  padding: 8px 4px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 14px;
+  border-radius: 8px;
+}
+
+.bottom-nav button.active {
+  color: #fff;
+  background: var(--green);
+}
+
+@media (min-width: 760px) {
+  .app-header {
+    padding-inline: calc((100% - 980px) / 2 + 16px);
+  }
+
+  .quick-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 16px;
+  }
+
+  .app-header {
+    align-items: flex-start;
+    padding: 14px 12px 10px;
+  }
+
+  .app-shell {
+    padding: 12px 12px 104px;
+  }
+
+  .metric-grid,
+  .stats-grid,
+  .number-row {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 14px;
+  }
+
+  .schedule-card {
+    padding: 14px;
+    margin-bottom: 0;
+    border-radius: 12px;
+  }
+
+  .schedule-time {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .schedule-title {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  button,
+  input,
+  select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}

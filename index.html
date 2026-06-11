@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>減脂飲食與訓練追蹤工具</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Fat loss tracker</p>
+        <h1>減脂飲食與訓練追蹤</h1>
+      </div>
+      <button class="ghost-button" id="todayShortcut" type="button">回到今天</button>
+    </header>
+
+    <main class="app-shell">
+      <section class="view active" id="view-dashboard" aria-labelledby="dashboard-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Dashboard</p>
+            <h2 id="dashboard-title">首頁</h2>
+          </div>
+          <div class="date-pill" id="todayLabel"></div>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card" id="calorieCard">
+            <span>今日熱量</span>
+            <strong id="calorieSummary">0 / 2400 kcal</strong>
+            <div class="progress"><span id="calorieProgress"></span></div>
+            <small id="calorieRemain">剩餘 2400 kcal</small>
+          </article>
+          <article class="metric-card" id="proteinCard">
+            <span>今日蛋白質</span>
+            <strong id="proteinSummary">0 / 160 g</strong>
+            <div class="progress"><span id="proteinProgress"></span></div>
+            <small id="proteinRemain">剩餘 160 g</small>
+          </article>
+          <article class="metric-card" id="stepCard">
+            <span>今日步數</span>
+            <strong id="stepSummary">0 / 8000 步</strong>
+            <div class="progress"><span id="stepProgress"></span></div>
+            <small id="stepStatus">尚未達標</small>
+          </article>
+          <article class="metric-card" id="trainingCard">
+            <span>今日訓練</span>
+            <strong id="trainingSummary">尚未完成</strong>
+            <small id="trainingStatus">依行事曆或訓練紀錄判斷</small>
+          </article>
+        </div>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h3>今日整天行事曆</h3>
+            <span id="scheduleCount"></span>
+          </div>
+          <div class="timeline" id="todaySchedule"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h3>今日建議</h3>
+          </div>
+          <div class="advice-list" id="adviceList"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h3>本週統計</h3>
+          </div>
+          <div class="stats-grid">
+            <div><span>最近 7 天平均體重</span><strong id="avgWeight">-- kg</strong></div>
+            <div><span>本週體重變化</span><strong id="weekWeightChange">-- kg</strong></div>
+            <div><span>本週腰圍變化</span><strong id="weekWaistChange">-- cm</strong></div>
+            <div><span>重訓完成</span><strong id="strengthCount">0 次</strong></div>
+            <div><span>有氧完成</span><strong id="cardioCount">0 次</strong></div>
+          </div>
+          <p class="insight" id="bodyInsight"></p>
+          <p class="insight" id="trainingInsight"></p>
+        </section>
+      </section>
+
+      <section class="view" id="view-food" aria-labelledby="food-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Food log</p>
+            <h2 id="food-title">飲食紀錄</h2>
+          </div>
+        </div>
+
+        <form class="panel form-grid" id="foodForm">
+          <h3>新增一餐</h3>
+          <label>日期<input type="date" name="date" required /></label>
+          <label>餐次
+            <select name="meal" required>
+              <option>早餐</option>
+              <option>午餐</option>
+              <option>晚餐</option>
+              <option>點心</option>
+              <option>訓練前</option>
+              <option>訓練後</option>
+            </select>
+          </label>
+          <label>食物名稱<input name="name" required placeholder="例如：健康餐雞胸半飯" /></label>
+          <label>份量備註<input name="portion" placeholder="例如：飯半、少醬" /></label>
+          <div class="number-row">
+            <label>熱量 kcal<input type="number" name="calories" min="0" step="1" required /></label>
+            <label>蛋白質 g<input type="number" name="protein" min="0" step="0.1" required /></label>
+          </div>
+          <div class="number-row">
+            <label>碳水 g<input type="number" name="carbs" min="0" step="0.1" /></label>
+            <label>脂肪 g<input type="number" name="fat" min="0" step="0.1" /></label>
+          </div>
+          <label class="checkline"><input type="checkbox" name="eatOut" /> 是否為外食</label>
+          <label>備註<textarea name="note" rows="2"></textarea></label>
+          <button type="submit">新增飲食紀錄</button>
+        </form>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h3>常用食物一鍵加入</h3>
+            <button class="secondary-button" id="fillSavedFoodForm" type="button">新增常用食物</button>
+          </div>
+          <div class="quick-list" id="quickFoods"></div>
+        </section>
+
+        <form class="panel form-grid hidden" id="savedFoodForm">
+          <h3>常用食物管理</h3>
+          <input type="hidden" name="id" />
+          <label>名稱<input name="name" required /></label>
+          <label>分類
+            <select name="category">
+              <option>早餐</option>
+              <option>午餐</option>
+              <option>晚餐</option>
+              <option>點心</option>
+            </select>
+          </label>
+          <div class="number-row">
+            <label>熱量<input type="number" name="calories" min="0" step="1" required /></label>
+            <label>蛋白質<input type="number" name="protein" min="0" step="0.1" required /></label>
+          </div>
+          <div class="number-row">
+            <label>碳水<input type="number" name="carbs" min="0" step="0.1" /></label>
+            <label>脂肪<input type="number" name="fat" min="0" step="0.1" /></label>
+          </div>
+          <button type="submit">儲存常用食物</button>
+        </form>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h3>今日飲食加總</h3>
+          </div>
+          <div class="stats-grid compact">
+            <div><span>總熱量</span><strong id="foodTotalCalories">0 kcal</strong></div>
+            <div><span>總蛋白質</span><strong id="foodTotalProtein">0 g</strong></div>
+            <div><span>總碳水</span><strong id="foodTotalCarbs">0 g</strong></div>
+            <div><span>總脂肪</span><strong id="foodTotalFat">0 g</strong></div>
+            <div><span>剩餘熱量</span><strong id="foodRemainCalories">2400 kcal</strong></div>
+            <div><span>剩餘蛋白質</span><strong id="foodRemainProtein">160 g</strong></div>
+          </div>
+          <div class="log-list" id="foodLogs"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-body" aria-labelledby="body-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Body log</p>
+            <h2 id="body-title">體重 / 腰圍紀錄</h2>
+          </div>
+        </div>
+
+        <form class="panel form-grid" id="bodyForm">
+          <h3>新增身體紀錄</h3>
+          <label>日期<input type="date" name="date" required /></label>
+          <div class="number-row">
+            <label>體重 kg<input type="number" name="weight" min="0" step="0.1" /></label>
+            <label>腰圍 cm<input type="number" name="waist" min="0" step="0.1" /></label>
+          </div>
+          <div class="number-row">
+            <label>步數<input type="number" name="steps" min="0" step="1" /></label>
+            <label>睡眠時數<input type="number" name="sleep" min="0" step="0.1" /></label>
+          </div>
+          <label>備註<textarea name="note" rows="2"></textarea></label>
+          <button type="submit">儲存身體紀錄</button>
+        </form>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h3>近期紀錄</h3>
+          </div>
+          <div class="log-list" id="bodyLogs"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-training" aria-labelledby="training-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Training log</p>
+            <h2 id="training-title">訓練紀錄</h2>
+          </div>
+        </div>
+
+        <form class="panel form-grid" id="trainingForm">
+          <h3>新增訓練</h3>
+          <label>日期<input type="date" name="date" required /></label>
+          <label>訓練類型
+            <select name="type" required>
+              <option>胸、肩、三頭</option>
+              <option>腿、臀、核心</option>
+              <option>背、二頭、後肩</option>
+              <option>胸背混合</option>
+              <option>有氧</option>
+              <option>休息</option>
+            </select>
+          </label>
+          <label class="checkline"><input type="checkbox" name="completed" checked /> 是否完成</label>
+          <label>訓練時間<input name="duration" placeholder="例如：60 分鐘" /></label>
+          <label>今天力量狀態
+            <select name="strength">
+              <option>很好</option>
+              <option>普通</option>
+              <option>很差</option>
+            </select>
+          </label>
+          <label>備註<textarea name="note" rows="2"></textarea></label>
+          <button type="submit">儲存訓練紀錄</button>
+        </form>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h3>本週完成</h3>
+          </div>
+          <div class="stats-grid compact">
+            <div><span>重訓</span><strong id="trainingPageStrength">0 次</strong></div>
+            <div><span>有氧</span><strong id="trainingPageCardio">0 次</strong></div>
+          </div>
+          <p class="insight" id="trainingPageInsight"></p>
+          <div class="log-list" id="trainingLogs"></div>
+        </section>
+      </section>
+
+      <section class="view" id="view-settings" aria-labelledby="settings-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Settings</p>
+            <h2 id="settings-title">設定</h2>
+          </div>
+        </div>
+
+        <form class="panel form-grid" id="settingsForm">
+          <h3>目標與基本設定</h3>
+          <div class="number-row">
+            <label>身高 cm<input type="number" name="height" min="0" step="0.1" /></label>
+            <label>目標熱量<input type="number" name="targetCalories" min="0" step="1" /></label>
+          </div>
+          <div class="number-row">
+            <label>蛋白質下限<input type="number" name="proteinMin" min="0" step="1" /></label>
+            <label>蛋白質上限<input type="number" name="proteinMax" min="0" step="1" /></label>
+          </div>
+          <div class="number-row">
+            <label>步數目標<input type="number" name="stepGoal" min="0" step="1" /></label>
+            <label>步數高標<input type="number" name="stepGoalHigh" min="0" step="1" /></label>
+          </div>
+          <div class="number-row">
+            <label>每週重訓目標<input type="number" name="weeklyStrengthGoal" min="0" step="1" /></label>
+            <label>每週有氧目標<input type="number" name="weeklyCardioGoal" min="0" step="1" /></label>
+          </div>
+          <h3>蛋白粉 1 份</h3>
+          <div class="number-row">
+            <label>熱量<input type="number" name="powderCalories" min="0" step="1" /></label>
+            <label>蛋白質<input type="number" name="powderProtein" min="0" step="0.1" /></label>
+          </div>
+          <div class="number-row">
+            <label>碳水<input type="number" name="powderCarbs" min="0" step="0.1" /></label>
+            <label>脂肪<input type="number" name="powderFat" min="0" step="0.1" /></label>
+          </div>
+          <button type="submit">儲存設定</button>
+          <button class="danger-button" id="resetData" type="button">清除所有紀錄</button>
+        </form>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="主要導覽">
+      <button class="active" type="button" data-view="dashboard">首頁</button>
+      <button type="button" data-view="food">飲食</button>
+      <button type="button" data-view="body">體重</button>
+      <button type="button" data-view="training">訓練</button>
+      <button type="button" data-view="settings">設定</button>
+    </nav>
+
+    <script src="script.js"></script>
+  </body>
+</html>
