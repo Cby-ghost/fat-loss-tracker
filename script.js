@@ -160,6 +160,7 @@ function bindNavigation() {
   });
 
   document.getElementById("todayShortcut").addEventListener("click", () => {
+    setViewedDate(formatDate(new Date()));
     showView("dashboard");
   });
 
@@ -169,6 +170,11 @@ function bindNavigation() {
 
   document.getElementById("nextDay").addEventListener("click", () => {
     setViewedDate(formatDate(addDays(parseDate(selectedDate), 1)));
+  });
+
+  document.getElementById("goToday").addEventListener("click", () => {
+    setViewedDate(formatDate(new Date()));
+    showView("dashboard");
   });
 
   document.getElementById("viewDate").addEventListener("change", (event) => {
